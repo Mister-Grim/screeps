@@ -9,6 +9,7 @@
 roles.scout = {};
 roles.scout.settings = {
   layoutString: 'M',
+  amount: [1],
   maxLayoutAmount: 1
 };
 
@@ -153,7 +154,7 @@ let breadthFirstSearch = function(creep) {
     return false;
   }
 
-  if (creep.pos.roomName !== creep.memory.last.pos3.roomName) {
+  if (creep.memory.last && creep.memory.last.pos3 && creep.pos.roomName !== creep.memory.last.pos3.roomName) {
     creep.moveTo(25, 25);
     return true;
   }
