@@ -47,9 +47,11 @@ Creep.prototype.moveToMy = function(target, range) {
 
   // Fallback to moveTo when the path is incomplete and the creep is only switching positions
   if (search.path.length < 2 && search.incomplete) {
+    this.log(`fallback ${JSON.stringify(target)} ${JSON.stringify(search)}`);
     this.moveTo(target);
     return false;
   }
+  this.say(this.pos.getDirectionTo(search.path[0] || target.pos || target));
   return this.move(this.pos.getDirectionTo(search.path[0] || target.pos || target));
 };
 
@@ -140,9 +142,22 @@ Creep.prototype.handle = function() {
 };
 
 Creep.prototype.isStuck = function() {
-  return this.memory.last !== undefined &&
-    this.memory.last.pos3 !== undefined &&
-    this.pos.isEqualTo(this.memory.last.pos3.x, this.memory.last.pos3.y);
+  if (!this.memory.last) {
+    return false;
+  }
+  if (!this.memory.last.pos2) {
+    return false;
+  }
+  if (!this.memory.last.pos3) {
+    return false;
+  }
+  if (!this.pos.isEqualTo(this.memory.last.pos2.x, this.memory.last.pos2.y)) {
+    return false;
+  }
+  if (!this.pos.isEqualTo(this.memory.last.pos3.x, this.memory.last.pos3.y)) {
+    return false;
+  }
+  return true;
 };
 
 Creep.prototype.getEnergyFromStructure = function() {

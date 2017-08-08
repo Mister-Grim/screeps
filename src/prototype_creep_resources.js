@@ -24,7 +24,7 @@ Creep.prototype.harvesterBeforeStorage = function() {
   } else {
     methods.push(Creep.repairStructure);
   }
-  this.say('startup', true);
+  // this.say('startup', true);
   Creep.execute(this, methods);
   return true;
 };
@@ -508,6 +508,27 @@ Creep.prototype.setHasEnergy = function() {
   }
 };
 
+Creep.prototype.getDroppedEnergy = function() {
+  let target = this.pos.findClosestByRangePropertyFilter(FIND_DROPPED_RESOURCES, 'resourceType', [RESOURCE_ENERGY], false, {
+    filter: object => object.amount > 0
+  });
+  if (target === null) {
+    return false;
+  }
+  let energyRange = this.pos.getRangeTo(target.pos);
+  if (energyRange <= 1) {
+    this.pickupOrWithdrawFromSourcer(target);
+    return true;
+  }
+  if (target.energy > (energyRange * 10) * (this.carry.energy + 1)) {
+    this.say('dropped');
+    let returnCode = this.moveToMy(target.pos, 1);
+    // this.say(returnCode);
+    return true;
+  }
+  return false;
+};
+
 Creep.prototype.getEnergy = function() {
   /* State machine:
    * No energy, goes to collect energy until full.
@@ -521,6 +542,7 @@ Creep.prototype.getEnergy = function() {
   if (this.getDroppedEnergy()) {
     return true;
   }
+  this.say('adrop');
   if (this.getEnergyFromStorage()) {
     return true;
   }
@@ -592,7 +614,7 @@ Creep.prototype.transferEnergyMy = function() {
   }
 
   var target = Game.getObjectById(this.memory.targetEnergyMy);
-  if (!target) {
+  if (!target || (target.structureType !== STRUCTURE_STORAGE && target.energy === target.energyCapacity)) {
     this.log(`transferEnergyMy: Can not find target ${this.memory.targetEnergyMy}`);
     delete this.memory.targetEnergyMy;
     return false;
