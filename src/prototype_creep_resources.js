@@ -542,7 +542,6 @@ Creep.prototype.getEnergy = function() {
   if (this.getDroppedEnergy()) {
     return true;
   }
-  this.say('adrop');
   if (this.getEnergyFromStorage()) {
     return true;
   }
